@@ -42,6 +42,23 @@
     listarServicios: function () {
       if (!sb) return Promise.resolve({ data: null, error: { message: 'sin-conexion' } });
       return sb.from('servicios').select('*').eq('publicado', true).order('orden');
+    },
+
+    // ── Auth (login del CRM — Matías) ────────────────────────
+    getSession: function () {
+      if (!sb) return Promise.resolve({ data: { session: null } });
+      return sb.auth.getSession();
+    },
+    signIn: function (email, password) {
+      if (!sb) return Promise.resolve({ error: { message: 'sin-conexion' } });
+      return sb.auth.signInWithPassword({ email: email, password: password });
+    },
+    signOut: function () {
+      if (!sb) return Promise.resolve({});
+      return sb.auth.signOut();
+    },
+    onAuth: function (cb) {
+      if (sb) sb.auth.onAuthStateChange(cb);
     }
   };
 

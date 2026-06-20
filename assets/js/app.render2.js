@@ -166,8 +166,37 @@
       '<button ' + aAttr('whats', telDigits(co.tel)) + ' style="margin-top:16px;width:100%;padding:14px;border-radius:12px;border:0;background:var(--accent);color:var(--accent-fg);font-family:inherit;font-size:14.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 11.5a8.4 8.4 0 0 1-12.3 7.4L3 20.5l1.7-5.4A8.4 8.4 0 1 1 21 11.5z"/></svg>Escribir por WhatsApp</button>' +
       '</div></div>';
   }
+  function authMsg(m) {
+    m = String(m || '');
+    if (/invalid login credentials/i.test(m)) return 'Email o contraseña incorrectos.';
+    if (/email not confirmed/i.test(m)) return 'Email sin confirmar. Revisa tu correo.';
+    if (/sin-conexion/i.test(m)) return 'Sin conexión a Supabase.';
+    return 'No se pudo iniciar sesión: ' + m;
+  }
+  function authInput(label, fieldName, type, ph, val) {
+    return '<div style="text-align:left;margin-top:12px"><label style="font-size:12px;font-weight:700;color:#C5D0E4;display:block;margin-bottom:6px">' + label + '</label>' +
+      '<input type="' + (type === 'password' ? 'password' : 'email') + '" value="' + esc(val) + '" data-field="' + fieldName + '" placeholder="' + esc(ph) + '" style="width:100%;padding:12px 13px;border-radius:11px;border:1.5px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-size:14.5px;outline:none" data-focus="border-color:var(--accent)"/></div>';
+  }
+  function crmLogin(v) {
+    var st = App.state;
+    var err = st.authErr ? '<div style="margin-top:12px;background:rgba(224,112,95,.14);border:1px solid rgba(224,112,95,.4);color:#F2B5AB;font-size:12.5px;border-radius:10px;padding:10px 12px;text-align:left">' + esc(st.authErr) + '</div>' : '';
+    var btnStyle = 'width:100%;margin-top:16px;padding:14px;border-radius:12px;border:0;background:var(--accent);color:var(--accent-fg);font-family:inherit;font-size:15px;font-weight:700;cursor:' + (st.authLoading ? 'wait' : 'pointer') + ';';
+    return '<div style="min-height:100%;display:flex;align-items:center;justify-content:center;padding:28px 22px;background:radial-gradient(700px 360px at 80% -10%, rgba(43,160,171,.14), transparent 60%), linear-gradient(150deg,#16234A,#0F1933)">' +
+      '<div style="width:100%;max-width:340px;text-align:center;color:#fff">' +
+      '<div style="width:52px;height:52px;margin:0 auto;color:var(--accent)">' + tria(52) + '</div>' +
+      '<div style="font-size:11px;letter-spacing:.18em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-top:14px">CRM · ' + esc(v.shopName) + '</div>' +
+      '<h2 style="font-family:\'Newsreader\',serif;font-size:26px;font-weight:600;color:#fff;margin:6px 0 0">Panel de Matías</h2>' +
+      '<p style="font-size:13px;color:#9FB0CC;margin:6px 0 0;line-height:1.5">Acceso privado. Ingresa para ver tu agenda, clientes y finanzas.</p>' +
+      authInput('Email', 'authEmail', 'email', 'tu@email.cl', st.authEmail) +
+      authInput('Contraseña', 'authPass', 'password', '••••••••', st.authPass) +
+      err +
+      '<button ' + aAttr('login') + ' style="' + btnStyle + '">' + (st.authLoading ? 'Entrando…' : 'Entrar') + '</button>' +
+      '<div style="display:flex;align-items:center;gap:7px;justify-content:center;margin-top:18px;color:#6E7CA3;font-size:11px"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Conexión segura · Supabase Auth</div>' +
+      '</div></div>';
+  }
   function secCrm(v) {
     var st = App.state;
+    if (v.crmLocked) return crmLogin(v);
     if (st.client != null && v.co) {
       return '<div style="padding-bottom:74px;background:var(--app-bg);min-height:100%">' + crmClientDetail(v) + '</div>';
     }
@@ -180,7 +209,7 @@
     return '<div style="padding-bottom:74px;background:var(--app-bg);min-height:100%"><div>' +
       '<div style="padding:16px 18px 14px;background:var(--surface);border-bottom:1px solid var(--hair);position:sticky;top:0;z-index:3"><div style="' + v.colWide + ';display:flex;align-items:center;justify-content:space-between">' +
       '<div><div style="font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--txt3);font-weight:700;white-space:nowrap">' + esc(v.shopName) + '</div><div style="font-family:\'Newsreader\',serif;font-size:20px;font-weight:600;color:var(--ink);line-height:1.15">' + esc(crmTitles[st.crmTab] || 'Resumen') + '</div></div>' +
-      '<div style="display:flex;align-items:center;gap:12px"><div style="' + v.deskTabs + '">' + tabs + '</div><div style="width:38px;height:38px;flex:none;border-radius:50%;background:#16234A;color:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700">MF</div></div>' +
+      '<div style="display:flex;align-items:center;gap:12px"><div style="' + v.deskTabs + '">' + tabs + '</div><button ' + aAttr('logout') + ' title="Cerrar sesión" style="width:38px;height:38px;flex:none;border-radius:50%;background:#16234A;color:#fff;border:0;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;font-family:inherit">MF</button></div>' +
       '</div></div><div style="' + v.colWide + '">' + content + '</div></div></div>';
   }
 
@@ -267,7 +296,7 @@
   }
   function buildStage(v) {
     var st = App.state;
-    var bottomBar = (st.route === 'crm' && !v.desk && st.client == null) ? crmBottomBar(v) : '';
+    var bottomBar = (st.route === 'crm' && !v.desk && st.client == null && !v.crmLocked) ? crmBottomBar(v) : '';
     var screen = '<div style="' + v.screenStyle + '">' + statusBar(v) +
       '<div class="scr" id="bt-scroll" style="flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;background:var(--app-bg)">' + activeSection(v) + '</div>' +
       bottomBar + stickyCTA(v) + overlays(v) + '</div>';
@@ -341,6 +370,16 @@
       App.setState({ enrollDone: true });
     },
     crmTab: function (a) { App.setState({ crmTab: a, client: null }); },
+    login: function () {
+      var s = App.state;
+      if (!(s.authEmail.trim() && s.authPass)) { App.setState({ authErr: 'Ingresa tu email y contraseña.' }); return; }
+      App.setState({ authLoading: true, authErr: '' });
+      BT_DB.signIn(s.authEmail.trim(), s.authPass).then(function (r) {
+        if (r && r.error) App.setState({ authLoading: false, authErr: authMsg(r.error.message) });
+        else App.setState({ authed: true, authLoading: false, authPass: '', authErr: '' });
+      }).catch(function () { App.setState({ authLoading: false, authErr: 'Error de conexión. Intenta de nuevo.' }); });
+    },
+    logout: function () { if (window.BT_DB) BT_DB.signOut(); App.setState({ authed: false, crmTab: 'resumen', client: null, authPass: '', authErr: '' }); },
     openClient: function (a) { App.setState({ client: +a }, { resetScroll: true }); },
     closeClient: function () { App.setState({ client: null }); },
     openAdd: function () { App.setState({ addOpen: true }); },
@@ -399,7 +438,23 @@
       App.state[f] = e.target.value;
       App.render();
     });
+    // Enter en el login = Entrar
+    root.addEventListener('keydown', function (e) {
+      if (e.key !== 'Enter') return;
+      var f = e.target.dataset && e.target.dataset.field;
+      if (f === 'authEmail' || f === 'authPass') { e.preventDefault(); ACT.login(); }
+    });
     App.render();
+    // Bootstrap de sesión (login real del CRM)
+    if (window.BT_DB && BT_DB.ready) {
+      BT_DB.getSession().then(function (r) {
+        var sess = r && r.data && r.data.session;
+        App.state.authed = !!sess;
+        if (sess && sess.user) App.state.authEmail = sess.user.email || App.state.authEmail;
+        App.render();
+      });
+      BT_DB.onAuth(function (_e, session) { App.state.authed = !!session; App.render(); });
+    }
   };
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', App.mount);

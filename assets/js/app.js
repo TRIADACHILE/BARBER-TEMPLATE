@@ -57,7 +57,9 @@
       crmTab: 'resumen', client: null, q: '', aday: 3,
       enrollOpen: false, enrollDone: false, enName: '', enEmail: '', enPlan: 'contado',
       addOpen: false, acName: '', acTel: '', acFav: 'corte',
-      citaTime: null, ciClient: 0, ciSvc: 'corte', extraClients: [], agendaExtra: {}
+      citaTime: null, ciClient: 0, ciSvc: 'corte', extraClients: [], agendaExtra: {},
+      // auth del CRM (login real de Matías)
+      authed: false, authEmail: '', authPass: '', authErr: '', authLoading: false
     },
     _resetScroll: false,
 
@@ -149,6 +151,10 @@
     // clientes
     v.allCli = D.CLI.concat(st.extraClients);
     v.co = st.client != null ? v.allCli[st.client] : null;
+
+    // CRM bajo login real: si hay Supabase y no hay sesión → bloqueado.
+    // Sin conexión (offline / file://) NO se bloquea, así la demo sigue explorable.
+    v.crmLocked = !!(window.BT_DB && window.BT_DB.ready && !st.authed);
     return v;
   }
 
