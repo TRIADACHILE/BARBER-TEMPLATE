@@ -152,9 +152,9 @@
     v.allCli = D.CLI.concat(st.extraClients);
     v.co = st.client != null ? v.allCli[st.client] : null;
 
-    // CRM bajo login real: si hay Supabase y no hay sesión → bloqueado.
-    // Sin conexión (offline / file://) NO se bloquea, así la demo sigue explorable.
-    v.crmLocked = !!(window.BT_DB && window.BT_DB.ready && !st.authed);
+    // TODA la demo bajo login real: si hay Supabase y no hay sesión → bloqueada.
+    // Sin conexión (offline / file://) NO se bloquea, así sigue explorable en local.
+    v.locked = !!(window.BT_DB && window.BT_DB.ready && !st.authed);
     return v;
   }
 

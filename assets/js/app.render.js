@@ -35,6 +35,8 @@
     var icos = D.IORDER.map(function (k) {
       return '<button ' + aAttr('setIcons', k) + ' style="' + v.icoBtn(k) + '"><span style="' + v.icoChip(k) + '"></span>' + esc(D.ICONS[k].name) + '</button>';
     }).join('');
+    // Cerrar sesión (solo cuando hay login real activo)
+    var logout = (window.BT_DB && window.BT_DB.ready) ? '<button ' + aAttr('logout') + ' style="margin-top:10px;display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,.1);background:transparent;color:#9FB0CC;font-family:inherit;font-size:12.5px;font-weight:600;cursor:pointer" data-hover="background:rgba(255,255,255,.05);color:#fff"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><path d="m16 17 5-5-5-5"/><path d="M21 12H9"/></svg>Cerrar sesión</button>' : '';
 
     return '' +
       '<aside class="scr" style="width:336px;flex:none;padding:26px 22px 30px;display:flex;flex-direction:column;gap:20px;border-right:1px solid rgba(255,255,255,.07);height:100vh;overflow-y:auto;position:sticky;top:0">' +
@@ -56,7 +58,7 @@
       '  <div style="margin-top:auto;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:13px 14px;display:flex;gap:11px;align-items:flex-start">' +
       '    <div style="width:30px;height:30px;flex:none;color:var(--accent)">' + tria(30) + '</div>' +
       '    <div><div style="font-size:12.5px;font-weight:700;color:#ECF1FA">trIA incluido</div><div style="font-size:11px;line-height:1.5;color:#8C99B5;margin-top:2px">Reservas, agenda y análisis del negocio. La firma de Tríada.</div></div>' +
-      '  </div>' +
+      '  </div>' + logout +
       '</aside>';
   }
 
