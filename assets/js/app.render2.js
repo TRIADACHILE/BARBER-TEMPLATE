@@ -174,8 +174,13 @@
     return 'No se pudo iniciar sesión: ' + m;
   }
   function authInput(label, fieldName, type, ph, val) {
+    // type="email"/"number" NO soportan selectionStart → rompe la restauración
+    // del cursor al re-render (texto invertido). Usamos text + inputmode.
+    var typeAttr = type === 'password'
+      ? 'type="password" autocomplete="current-password"'
+      : 'type="text" inputmode="email" autocomplete="username" autocapitalize="none" spellcheck="false"';
     return '<div style="text-align:left;margin-top:12px"><label style="font-size:12px;font-weight:700;color:#C5D0E4;display:block;margin-bottom:6px">' + label + '</label>' +
-      '<input type="' + (type === 'password' ? 'password' : 'email') + '" value="' + esc(val) + '" data-field="' + fieldName + '" placeholder="' + esc(ph) + '" style="width:100%;padding:12px 13px;border-radius:11px;border:1.5px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-size:14.5px;outline:none" data-focus="border-color:var(--accent)"/></div>';
+      '<input ' + typeAttr + ' value="' + esc(val) + '" data-field="' + fieldName + '" placeholder="' + esc(ph) + '" style="width:100%;padding:12px 13px;border-radius:11px;border:1.5px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#fff;font-size:14.5px;outline:none" data-focus="border-color:var(--accent)"/></div>';
   }
   // Login a PÁGINA COMPLETA: protege el acceso a TODA la demo.
   function appLogin(v) {
@@ -420,7 +425,7 @@
     root.innerHTML = buildAll(v);
     var sc2 = document.getElementById('bt-scroll'); if (sc2) sc2.scrollTop = App._resetScroll ? 0 : prev;
     App._resetScroll = false;
-    if (fKey) { var el = root.querySelector('[data-field="' + fKey + '"]'); if (el) { el.focus(); try { if (selS != null) el.setSelectionRange(selS, selE); } catch (e) {} } }
+    if (fKey) { var el = root.querySelector('[data-field="' + fKey + '"]'); if (el) { el.focus(); try { if (selS == null) { selS = selE = el.value.length; } el.setSelectionRange(selS, selE); } catch (e) {} } }
     attachHoverFocus(root);
   };
 
