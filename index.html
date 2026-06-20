@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Barbería Triada · Plataforma — Demo Tríada</title>
+  <meta name="description" content="Plataforma integral para barbería: sitio web, reservas con trIA, escuela de cursos y CRM. Una demo de Tríada.">
+
+  <!-- Fuentes de marca (Tríada): Newsreader (serif) + Hanken Grotesk (UI) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+
+  <!-- Foundation Kit · Pilar MARCA  (orden: theme → brand → components → app) -->
+  <link rel="stylesheet" href="assets/css/theme.css">
+  <link rel="stylesheet" href="assets/css/brand.css">
+  <link rel="stylesheet" href="assets/css/components.css">
+  <link rel="stylesheet" href="assets/css/app.css">
+</head>
+<body>
+  <div id="app"></div>
+
+  <!-- Datos de demo (en producción → Supabase, ver supabase/) -->
+  <script src="assets/js/data.js"></script>
+  <!-- Componente de imágenes (drag & drop, persiste en localStorage) -->
+  <script src="assets/js/image-slot.js"></script>
+  <!-- App: lógica → render → mount -->
+  <script src="assets/js/app.js"></script>
+  <script src="assets/js/app.render.js"></script>
+  <script src="assets/js/app.render2.js"></script>
+</body>
+</html>
