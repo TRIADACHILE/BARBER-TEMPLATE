@@ -10,28 +10,50 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
-
-  <!-- Foundation Kit · Pilar MARCA  (orden: theme → brand → components → app) -->
-  <link rel="stylesheet" href="assets/css/theme.css">
-  <link rel="stylesheet" href="assets/css/brand.css">
-  <link rel="stylesheet" href="assets/css/components.css">
-  <link rel="stylesheet" href="assets/css/app.css">
 </head>
 <body>
   <div id="app"></div>
 
-  <!-- Supabase (build UMD, versión pineada) + conexión del proyecto -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.1/dist/umd/supabase.js"></script>
-  <script src="assets/js/config.js"></script>
-  <script src="assets/js/supabase.js"></script>
+  <!-- ============================================================
+       Cargador con cache-busting.
+       A cada CSS/JS local le agrega ?v=<timestamp> en cada carga, así
+       el navegador SIEMPRE baja la última versión publicada — el cliente
+       nunca ve una versión vieja ni tiene que recargar a mano.
+       El <body> está vacío (la app se dibuja por JS), así que no hay
+       parpadeo de estilos. El orden se preserva con async=false.
+       ============================================================ -->
+  <script>
+  (function () {
+    var v = Date.now();
+    function bust(p) { return p + (p.indexOf('?') < 0 ? '?' : '&') + 'v=' + v; }
 
-  <!-- Datos de demo (fallback local si no hay conexión; ver supabase/) -->
-  <script src="assets/js/data.js"></script>
-  <!-- Componente de imágenes (drag & drop, persiste en localStorage) -->
-  <script src="assets/js/image-slot.js"></script>
-  <!-- App: lógica → render → mount -->
-  <script src="assets/js/app.js"></script>
-  <script src="assets/js/app.render.js"></script>
-  <script src="assets/js/app.render2.js"></script>
+    // Foundation Kit · MARCA  (orden: theme → brand → components → app)
+    ['assets/css/theme.css', 'assets/css/brand.css', 'assets/css/components.css', 'assets/css/app.css']
+      .forEach(function (href) {
+        var l = document.createElement('link');
+        l.rel = 'stylesheet'; l.href = bust(href);
+        document.head.appendChild(l);
+      });
+
+    // JS en orden estricto (Supabase UMD → config → cliente → datos → app).
+    // El CDN externo ya está versionado, no se le agrega token.
+    var scripts = [
+      'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.1/dist/umd/supabase.js',
+      'assets/js/config.js',
+      'assets/js/supabase.js',
+      'assets/js/data.js',
+      'assets/js/image-slot.js',
+      'assets/js/app.js',
+      'assets/js/app.render.js',
+      'assets/js/app.render2.js'
+    ];
+    scripts.forEach(function (src) {
+      var s = document.createElement('script');
+      s.src = /^https?:/.test(src) ? src : bust(src);
+      s.async = false; // preserva el orden de ejecución
+      document.head.appendChild(s);
+    });
+  })();
+  </script>
 </body>
 </html>
