@@ -20,7 +20,12 @@
 <body>
   <div id="app"></div>
 
-  <!-- Datos de demo (en producción → Supabase, ver supabase/) -->
+  <!-- Supabase (build UMD, versión pineada) + conexión del proyecto -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.108.1/dist/umd/supabase.js"></script>
+  <script src="assets/js/config.js"></script>
+  <script src="assets/js/supabase.js"></script>
+
+  <!-- Datos de demo (fallback local si no hay conexión; ver supabase/) -->
   <script src="assets/js/data.js"></script>
   <!-- Componente de imágenes (drag & drop, persiste en localStorage) -->
   <script src="assets/js/image-slot.js"></script>

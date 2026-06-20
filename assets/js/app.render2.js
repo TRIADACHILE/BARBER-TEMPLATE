@@ -313,12 +313,33 @@
     next: function (a) { var s = App.state, t = +a; if (t === 2 && !s.svc) return; if (t === 4 && !s.slot) return; App.setState({ bStep: t }); },
     pickDay: function (a) { App.setState({ day: +a }); },
     pickSlot: function (a) { App.setState({ slot: a }); },
-    confirm: function () { var s = App.state; var svc = D.SERV.find(function (x) { return x.id === s.svc; }); if (svc && s.slot && s.bName.trim() && s.bPhone.trim()) App.setState({ confirmed: true }, { resetScroll: true }); },
+    confirm: function () {
+      var s = App.state; var svc = D.SERV.find(function (x) { return x.id === s.svc; });
+      if (!(svc && s.slot && s.bName.trim() && s.bPhone.trim())) return;
+      // fecha ISO (yyyy-mm-dd) desde el offset de día elegido
+      var d = new Date(); d.setHours(0, 0, 0, 0); d.setDate(d.getDate() + s.day);
+      var pad = function (n) { return String(n).padStart(2, '0'); };
+      var fecha = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+      if (window.BT_DB && BT_DB.ready) {
+        BT_DB.crearCita({ cliente_nombre: s.bName.trim(), telefono: s.bPhone.trim(), servicio_nombre: svc.n, fecha: fecha, hora: s.slot, estado: 'pendiente' })
+          .then(function (r) { if (r && r.error) console.warn('[BT] No se pudo guardar la cita:', r.error.message); })
+          .catch(function (e) { console.warn('[BT] Error guardando cita:', e); });
+      }
+      App.setState({ confirmed: true }, { resetScroll: true });
+    },
     reset: function () { App.setState({ bStep: 1, svc: null, slot: null, bName: '', bPhone: '', confirmed: false }, { resetScroll: true }); },
     enroll: function () { App.setState({ enrollOpen: true }); },
     closeEnroll: function () { App.setState({ enrollOpen: false, enrollDone: false, enName: '', enEmail: '', enPlan: 'contado' }); },
     setPlan: function (a) { App.setState({ enPlan: a }); },
-    enConfirm: function () { var s = App.state; if (s.enName.trim() && s.enEmail.trim()) App.setState({ enrollDone: true }); },
+    enConfirm: function () {
+      var s = App.state; if (!(s.enName.trim() && s.enEmail.trim())) return;
+      if (window.BT_DB && BT_DB.ready) {
+        BT_DB.crearInscripcion({ nombre: s.enName.trim(), email: s.enEmail.trim(), plan: s.enPlan })
+          .then(function (r) { if (r && r.error) console.warn('[BT] No se pudo guardar la inscripción:', r.error.message); })
+          .catch(function (e) { console.warn('[BT] Error guardando inscripción:', e); });
+      }
+      App.setState({ enrollDone: true });
+    },
     crmTab: function (a) { App.setState({ crmTab: a, client: null }); },
     openClient: function (a) { App.setState({ client: +a }, { resetScroll: true }); },
     closeClient: function () { App.setState({ client: null }); },
